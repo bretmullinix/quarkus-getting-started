@@ -1,0 +1,96 @@
+apiVersion: v1
+items:
+- apiVersion: tekton.dev/v1beta1
+  kind: Pipeline
+  metadata:
+    name: test-quarkus-pipeline
+    namespace: test-quarkus
+  spec:
+    params:
+    - description: name of the deployment to be patched
+      name: deployment-name
+      type: string
+    - description: url of the git repo for the code of deployment
+      name: git-url
+      type: string
+    - default: master
+      description: revision to be used from repo of the code for deployment
+      name: git-revision
+      type: string
+    - description: image to be build from the code
+      name: IMAGE
+      type: string
+    tasks:
+    - name: fetch-repository
+      params:
+      - name: url
+        value: $(params.git-url)
+      - name: subdirectory
+        value: ""
+      - name: deleteExisting
+        value: "true"
+      - name: revision
+        value: $(params.git-revision)
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+      - name: output
+        workspace: shared-workspace    
+    - name: maven-run
+      taskRef:
+        name: maven
+      runAfter:
+        - fetch-repository
+      params:
+        - name: CONTEXT_DIR
+          value: "."
+        - name: GOALS
+          value:
+            - -DskipTests
+            - clean
+            - package
+      workspaces: 
+        - name: maven-settings
+          workspace: maven-settings
+        - name: source
+          workspace: shared-workspace
+    # - name: build-image
+    #   params:
+    #   - name: IMAGE
+    #     value: $(params.IMAGE)
+    #   runAfter:
+    #   - fetch-repository
+    #   taskRef:
+    #     kind: ClusterTask
+    #     name: buildah
+    #   workspaces:
+    #   - name: source
+    #     workspace: shared-workspace
+    # - name: apply-manifests
+    #   runAfter:
+    #   - build-image
+    #   taskRef:
+    #     kind: Task
+    #     name: apply-manifests
+    #   workspaces:
+    #   - name: source
+    #     workspace: shared-workspace
+    # - name: update-deployment
+    #   params:
+    #   - name: deployment
+    #     value: $(params.deployment-name)
+    #   - name: IMAGE
+    #     value: $(params.IMAGE)
+    #   runAfter:
+    #   - apply-manifests
+    #   taskRef:
+    #     kind: Task
+    #     name: update-deployment
+    workspaces:
+    - name: shared-workspace
+    - name: maven-settings
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""

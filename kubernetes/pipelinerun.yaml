@@ -1,0 +1,49 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  labels:
+    tekton.dev/pipeline: test-quarkus-pipeline
+  name: test-quarkus-pipeline-run
+  namespace: test-quarkus
+spec:
+  params:
+  - name: IMAGE
+    value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-ui
+  - name: deployment-name
+    value: quarkus-getting-started
+  - name: git-url
+    value: https://github.com/bretmullinix/quarkus-getting-started.git
+  - name: git-revision
+    value: main
+  pipelineRef:
+    name: test-quarkus-pipeline
+  serviceAccountName: github-token-sa
+  timeout: 1h0m0s
+  workspaces:
+  - name: maven-settings
+    volumeClaimTemplate:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: mvn-pvc
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Mi
+  - name: shared-workspace
+    volumeClaimTemplate:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: source-pvc
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Mi
+      status: {}

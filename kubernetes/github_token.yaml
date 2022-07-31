@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    tekton.dev/git-0: https://github.com
+  name: github-token
+  namespace: test-quarkus
+type: kubernetes.io/basic-auth
+stringData:
+  username: bretmullinix
+  password: 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
