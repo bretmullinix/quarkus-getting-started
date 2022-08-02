@@ -17,7 +17,7 @@ spec:
     value: main
   pipelineRef:
     name: test-quarkus-pipeline
-  serviceAccountName: github-token-sa
+  serviceAccountName: pipeline-sa
   timeout: 1h0m0s
   workspaces:
   - name: maven-settings
