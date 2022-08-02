@@ -1,0 +1,23 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: apply-one-manifest
+spec:
+  workspaces:
+  - name: source
+  params:
+    - name: manifest_file_path
+      description: The full path of the manifest file to run
+      type: string
+      default: ""
+  steps:
+    - name: apply
+      image: quay.io/openshift/origin-cli:latest
+      workingDir: /workspace/source
+      command: ["/bin/bash", "-c"]
+      args:
+        - |-
+          echo Applying manifest located here-- $(inputs.params.manifest_file_path)
+          oc delete -f $(inputs.params.manifest_file_path)
+          oc apply -f $(inputs.params.manifest_file_path)
+          echo -----------------------------------
