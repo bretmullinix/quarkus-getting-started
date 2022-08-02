@@ -22,6 +22,20 @@ Apply the buildah task locally in namespace:  kubectl apply -f https://raw.githu
       --docker-password=$CONTAINER_REGISTRY_PASSWORD
     ```
 
+1. Here are the two example secrets I added
+
+    ```
+       kubectl create secret -n test-quarkus docker-registry quay-registry-secret \
+     --docker-server=$CONTAINER_REGISTRY_SERVER \
+     --docker-username=$CONTAINER_REGISTRY_USER \
+      --docker-password=$CONTAINER_REGISTRY_PASSWORD
+
+    kubectl create secret -n test-quarkus docker-registry redhat-registry-secret \
+     --docker-server=$CONTAINER_REGISTRY_SERVER \
+     --docker-username=$CONTAINER_REGISTRY_USER \
+      --docker-password=$CONTAINER_REGISTRY_PASSWORD
+    ```
+
 1. Add escalated privs for to run the pipeline
 
     ```

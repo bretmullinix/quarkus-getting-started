@@ -57,6 +57,7 @@ items:
           workspace: shared-workspace
     - name: buildah
       taskRef:
+        kind: ClusterTask
         name: buildah
       runAfter:
         - maven-run
@@ -86,24 +87,12 @@ items:
     #   workspaces:
     #   - name: source
     #     workspace: shared-workspace
-    - name: apply-namespace
-      params:
-        - name: manifest_file_path
-          value: "kubernetes/quarkus-namespace.yaml"
-      runAfter:
-      - buildah
-      taskRef:
-        kind: Task
-        name: apply-one-manifest
-      workspaces:
-      - name: source
-        workspace: shared-workspace
     - name: apply-deployment
       params:
         - name: manifest_file_path
           value: "target/kubernetes/kubernetes.yml"
       runAfter:
-      - apply-namespace
+      - buildah
       taskRef:
         kind: Task
         name: apply-one-manifest
